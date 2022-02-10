@@ -45,6 +45,11 @@ type view struct {
 	max Point
 }
 
+var (
+	user32                        = windows.NewLazySystemDLL("user32")
+	setProcessDpiAwarenessContext = user32.NewProc("SetProcessDpiAwarenessContext")
+)
+
 func newWindow(config *Config) (wv WebView, err error) {
 	w := &webview{
 		config: config,
@@ -125,6 +130,20 @@ func (w *webview) create() error {
 		runtime.LockOSThread()
 		w32.CoInitializeEx(w32.COINIT_APARTMENTTHREADED)
 
+		var restore uintptr
+		if setProcessDpiAwarenessContext.Find() == nil {
+			// try:
+			//   DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+			//   DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE
+			//   DPI_AWARENESS_CONTEXT_SYSTEM_AWARE
+			for i := -4; i <= -2; i++ {
+				restore, _, _ = setProcessDpiAwarenessContext.Call(uintptr(i))
+				if restore != 0 {
+					break
+				}
+			}
+		}
+		
 		go func() {
 			<-w.done
 			cerr <- nil
