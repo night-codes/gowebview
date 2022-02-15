@@ -1,4 +1,4 @@
-module github.com/inkeliz/gowebview
+module github.com/night-codes/gowebview
 
 go 1.13
 
