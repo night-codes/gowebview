@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/inkeliz/gowebview/internal/network"
+	"github.com/night-codes/gowebview/internal/network"
 	"io/ioutil"
 	"net/http"
 	"os"
